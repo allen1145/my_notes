@@ -24,3 +24,27 @@ while True:
     except EOFError:
         break
 ```
+### 深度优先搜索（dfs）
+```import sys
+sys.setrecursionlimit(20000)
+dx = [-1, -1, -1, 0, 0, 1, 1, 1]
+dy = [-1, 0, 1, 1, -1, -1, 0, 1]
+def dfs(x, y, field):
+    field[x][y] = '.'
+    for i in range(8):
+        nx, ny = x + dx[i], y + dy[i]
+        if 0 <= nx < N and 0 <= ny < M and\
+              field[nx][ny] == 'W':
+            dfs(nx, ny, field)
+N, M = map(int, input().split())
+field = []
+for i in range(N):
+    field.append(list(input()))
+counter = 0
+for i in range(N):
+    for j in range(M):
+        if field[i][j] == 'W':
+            dfs(i, j, field)
+            counter += 1
+print(counter)
+```
