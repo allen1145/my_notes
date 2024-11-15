@@ -8,7 +8,7 @@ def cal():
     else:
         return cur
 print("%.6f" % float(cal()))
-```
+```python
 ### 整数划分问题dp算法
 ```
 dp = [0] * (50 + 1)  
@@ -25,7 +25,8 @@ while True:
         break
 ```
 ### 深度优先搜索（dfs）
-```import sys
+```python
+import sys
 sys.setrecursionlimit(20000)
 dx = [-1, -1, -1, 0, 0, 1, 1, 1]
 dy = [-1, 0, 1, 1, -1, -1, 0, 1]
@@ -47,4 +48,37 @@ for i in range(N):
             dfs(i, j, field)
             counter += 1
 print(counter)
+```
+### 求排列的逆序数（二分归并）
+```python
+def mergeSort(arr):
+    if len(arr) <= 1:
+        return arr, 0
+    mid = len(arr) // 2
+    left, inv_count_left = mergeSort(arr[:mid])
+    right, inv_count_right = mergeSort(arr[mid:])
+    merged, inv_count = merge(left, right)
+    inv_count += inv_count_left + inv_count_right
+    return merged, inv_count
+def merge(left, right):
+    merged = []
+    inv_count = 0
+    i = j = 0
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            merged.append(left[i])
+            i += 1
+        else:
+            merged.append(right[j])
+            j += 1
+            inv_count += len(left) - i
+    merged += left[i:]
+    merged += right[j:]
+    return merged, inv_count
+# 输入排列
+n = int(input())
+arr = list(map(int, input().split()))
+# 调用归并排序函数并输出逆序数
+sorted_arr, inv_count = mergeSort(arr)
+print(inv_count)
 ```
