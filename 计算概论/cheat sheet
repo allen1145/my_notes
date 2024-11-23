@@ -270,3 +270,50 @@ class Solution:
             return [-1, -1]
     print(searchRange)
 ```
+### bfs算法模板
+```python
+#bfs写一下
+from collections import deque
+
+def in_bound(x, y, n, m):
+    if 0 <= x < n and 0 <= y < m:
+        return True
+    return False
+
+def bfs(matrix, visited, x, y, n, m):
+    directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+
+    queue = deque([(x, y)])
+    visited[x][y] = True
+
+    while queue:
+        cur_x, cur_y = queue.popleft()
+
+        for dx, dy in directions:
+            next_x = cur_x + dx
+            next_y = cur_y + dy
+
+            if in_bound(next_x, next_y, n, m) and matrix[next_x][next_y] == 1 and not visited[next_x][next_y]:
+                queue.append((next_x, next_y))
+                visited[next_x][next_y] = True
+def count_blocks(matrix, n, m):
+
+    visited = [[False] * m for _ in range(n)]
+    counter = 0
+
+    for i in range(n):
+        for j in range(m):
+
+            if matrix[i][j] == 1 and not visited[i][j]:
+                bfs(matrix, visited, i, j, n, m)
+                counter += 1
+    
+    return counter
+
+#主程序
+n, m = map(int,input().split())
+matrix = [list(map(int,input().split())) for _ in range(n)]
+
+print(count_blocks(matrix, n, m))
+```
+
