@@ -8,9 +8,9 @@ def cal():
     else:
         return cur
 print("%.6f" % float(cal()))
-```python
-### 整数划分问题dp算法
 ```
+### 整数划分问题dp算法
+```python
 dp = [0] * (50 + 1)  
 dp[0] = 1  # 基础情况：有一种方式来分解 0  
 for i in range(1, 50 + 1):  
@@ -82,8 +82,8 @@ arr = list(map(int, input().split()))
 sorted_arr, inv_count = mergeSort(arr)
 print(inv_count)
 ```
-#滑动窗口解决最长子列
-···python
+### 滑动窗口解决最长子列
+```python
 class Solution:
     def lengthOfLongestSubstring(self, s: str) -> int:
         #滑动窗口
@@ -100,7 +100,7 @@ class Solution:
     ans = lengthOfLongestSubstring
     print(ans)
 ```
-###接雨水
+### 接雨水
 ```python
 #动态规划解法
 class Solution:
@@ -187,4 +187,86 @@ path, last_path = [[0, 0]], []
 last_path, last_value = dfs(0, 0, n, m, visited, matrix, path, value, last_path, last_value)
 for i in last_path:
     print(' '.join([str(e + 1) for e in i]))
+```
+### 二维矩阵二分查找
+```python
+class Solution:
+    def searchMatrix(self, matrix: List[List[int]], target: int) -> bool:
+        n = len(matrix)
+        m = len(matrix[0])
+        #初始化指针
+        i, j = 0, n - 1
+
+        while i <= j:
+            mid_start = (i + j) // 2
+            if matrix[mid_start][0] <= target <= matrix[mid_start][-1]:
+                break
+            elif matrix[mid_start][0] < target:
+                i = mid_start + 1
+            else:
+                j = mid_start - 1
+        
+        #不存在
+        if i > j:
+            return False
+
+        l = matrix[mid_start]
+        start, end = 0, m - 1
+
+        while start <= end:
+            mid = (start + end) // 2
+            if l[mid] == target:
+                return True
+            elif l[mid] < target:
+                start = mid + 1
+            else:
+                end = mid - 1
+        if l[mid] == target:
+            return True
+        else:
+            return False
+    if searchMatrix:
+        print('true')
+    else:
+        print('false')
+```
+### 二分查找（找列表中一个数开始与结束位置）
+```python
+class Solution:
+    def searchRange(self, nums: List[int], target: int) -> List[int]:
+        n = len(nums)
+        if n == 0:
+            return [-1, -1]
+
+        #查找左边界（第一个等于target的数）
+        def binary_search_left(nums, target):
+            left, right = 0, n - 1
+            while left <= right:
+                mid = (left + right) // 2
+                if nums[mid] < target:
+                    left = mid + 1
+                else:
+                    right = mid - 1
+            return left
+
+        #查找右边界（第一个大于target的数）
+        def binary_search_right(nums, target):
+            left, right = 0, n - 1
+            while left <= right:
+                mid = (left + right) // 2
+                if nums[mid] <= target:
+                    left = mid + 1
+                else:
+                    right = mid - 1
+            return right
+
+        start = binary_search_left(nums, target)
+        end = binary_search_right(nums, target)
+
+        #判断
+        if start <= end and start < n and nums[start] == target:
+            return [start, end]
+        else:
+            return [-1, -1]
+    print(searchRange)
 ```
