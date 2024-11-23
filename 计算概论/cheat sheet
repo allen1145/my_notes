@@ -1,1 +1,272 @@
+### 递归算法以及eval()函数
+```python
+s = input().split()
+def cal():
+    cur = s.pop(0)
+    if cur in "+-*/":
+        return str(eval(cal() + cur + cal()))
+    else:
+        return cur
+print("%.6f" % float(cal()))
+```
+### 整数划分问题dp算法
+```python
+dp = [0] * (50 + 1)  
+dp[0] = 1  # 基础情况：有一种方式来分解 0  
+for i in range(1, 50 + 1):  
+    for j in range(i, 50 + 1):  
+        dp[j] += dp[j - i]   
+while True:
+    try:
+        n = int(input())
+        ans = dp[n]
+        print(ans)
+    except EOFError:
+        break
+```
+### 深度优先搜索（dfs）
+```python
+import sys
+sys.setrecursionlimit(20000)
+dx = [-1, -1, -1, 0, 0, 1, 1, 1]
+dy = [-1, 0, 1, 1, -1, -1, 0, 1]
+def dfs(x, y, field):
+    field[x][y] = '.'
+    for i in range(8):
+        nx, ny = x + dx[i], y + dy[i]
+        if 0 <= nx < N and 0 <= ny < M and\
+              field[nx][ny] == 'W':
+            dfs(nx, ny, field)
+N, M = map(int, input().split())
+field = []
+for i in range(N):
+    field.append(list(input()))
+counter = 0
+for i in range(N):
+    for j in range(M):
+        if field[i][j] == 'W':
+            dfs(i, j, field)
+            counter += 1
+print(counter)
+```
+### 求排列的逆序数（二分归并）
+```python
+def mergeSort(arr):
+    if len(arr) <= 1:
+        return arr, 0
+    mid = len(arr) // 2
+    left, inv_count_left = mergeSort(arr[:mid])
+    right, inv_count_right = mergeSort(arr[mid:])
+    merged, inv_count = merge(left, right)
+    inv_count += inv_count_left + inv_count_right
+    return merged, inv_count
+def merge(left, right):
+    merged = []
+    inv_count = 0
+    i = j = 0
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            merged.append(left[i])
+            i += 1
+        else:
+            merged.append(right[j])
+            j += 1
+            inv_count += len(left) - i
+    merged += left[i:]
+    merged += right[j:]
+    return merged, inv_count
+# 输入排列
+n = int(input())
+arr = list(map(int, input().split()))
+# 调用归并排序函数并输出逆序数
+sorted_arr, inv_count = mergeSort(arr)
+print(inv_count)
+```
+### 滑动窗口解决最长子列
+```python
+class Solution:
+    def lengthOfLongestSubstring(self, s: str) -> int:
+        #滑动窗口
+        char_map = {}
+        left, max_length = 0, 0
+        for right in range(len(s)):
+            if s[right] in char_map and char_map[s[right]] >= left:
+                left = char_map[s[right]] + 1
+                char_map[s[right]] = right
+            else:
+                char_map[s[right]] = right
+                max_length = max(max_length, right - left + 1)
+        return max_length
+    ans = lengthOfLongestSubstring
+    print(ans)
+```
+### 接雨水
+```python
+#动态规划解法
+class Solution:
+    def trap(self, height: List[int]) -> int:
+        n = len(height)
+        leftmax = [0] * n
+        rightmax = [0] * n
+        leftmax[0], rightmax[n - 1] = height[0], height[n - 1]
+        for i in range(1, n):
+            leftmax[i] = max(leftmax[i - 1], height[i])
+        for i in range(n - 2, -1, -1):
+            rightmax[i] = max(rightmax[i + 1], height[i])
+        ans = 0
+        for i in range(n):
+            ans += min(leftmax[i], rightmax[i]) - height[i]
+        return ans
+    ans = trap
+    print(ans)
+### 单调栈解法
+```python
+class Solution:
+    def trap(self, height: List[int]) -> int:
+        ans = 0
+        stack = list()
+        n = len(height)
+        
+        for i, h in enumerate(height):
+            while stack and h > height[stack[-1]]:
+                top = stack.pop()
+                if not stack:
+                    break
+                left = stack[-1]
+                currWidth = i - left - 1
+                currHeight = min(height[left], height[i]) - height[top]
+                ans += currWidth * currHeight
+            stack.append(i)
+        
+        return ans
+```
+### 扔一个dfs模板
+```python
+#可移动方式
+dx = [1, -1, 0, 0]
+dy = [0, 0, 1, -1]
 
+#维护，防止越界
+def in_bound(x, y, n, m):
+    return 0 <= x < n and 0 <= y < m
+
+#定义dfs函数
+def dfs(x, y, n, m, visited, matrix, path, value, last_path, last_value):
+    
+    #如果走到终点，且value大于last_value，更新last_value以及last_path
+    if x == n - 1 and y == m - 1:
+        if value > last_value or last_value == 0:
+            last_value = value
+            last_path = path[:]
+        return last_path, last_value
+    
+    #递归调用与回溯
+    for i in range(4):
+        next_x = x + dx[i]
+        next_y = y + dy[i]
+        if in_bound(next_x, next_y, n, m) and not visited[next_x][next_y]:
+            value += matrix[next_x][next_y]
+            path.append([next_x, next_y])
+            visited[next_x][next_y] = True
+            last_path, last_value = dfs(next_x, next_y, n, m, visited, matrix, path, value, last_path, last_value)
+            value -= matrix[next_x][next_y]
+            path.pop()
+            visited[next_x][next_y] = False
+    return last_path, last_value
+
+#主函数
+n, m = map(int,input().split())
+visited = [[False] * m for _ in range(n)]
+visited[0][0] = True
+matrix = []
+for i in range(n):
+    matrix.append(list(map(int,input().split())))
+#初始化
+value, last_value = matrix[0][0], float('-inf')
+path, last_path = [[0, 0]], []
+last_path, last_value = dfs(0, 0, n, m, visited, matrix, path, value, last_path, last_value)
+for i in last_path:
+    print(' '.join([str(e + 1) for e in i]))
+```
+### 二维矩阵二分查找
+```python
+class Solution:
+    def searchMatrix(self, matrix: List[List[int]], target: int) -> bool:
+        n = len(matrix)
+        m = len(matrix[0])
+        #初始化指针
+        i, j = 0, n - 1
+
+        while i <= j:
+            mid_start = (i + j) // 2
+            if matrix[mid_start][0] <= target <= matrix[mid_start][-1]:
+                break
+            elif matrix[mid_start][0] < target:
+                i = mid_start + 1
+            else:
+                j = mid_start - 1
+        
+        #不存在
+        if i > j:
+            return False
+
+        l = matrix[mid_start]
+        start, end = 0, m - 1
+
+        while start <= end:
+            mid = (start + end) // 2
+            if l[mid] == target:
+                return True
+            elif l[mid] < target:
+                start = mid + 1
+            else:
+                end = mid - 1
+        if l[mid] == target:
+            return True
+        else:
+            return False
+    if searchMatrix:
+        print('true')
+    else:
+        print('false')
+```
+### 二分查找（找列表中一个数开始与结束位置）
+```python
+class Solution:
+    def searchRange(self, nums: List[int], target: int) -> List[int]:
+        n = len(nums)
+        if n == 0:
+            return [-1, -1]
+
+        #查找左边界（第一个等于target的数）
+        def binary_search_left(nums, target):
+            left, right = 0, n - 1
+            while left <= right:
+                mid = (left + right) // 2
+                if nums[mid] < target:
+                    left = mid + 1
+                else:
+                    right = mid - 1
+            return left
+
+        #查找右边界（第一个大于target的数）
+        def binary_search_right(nums, target):
+            left, right = 0, n - 1
+            while left <= right:
+                mid = (left + right) // 2
+                if nums[mid] <= target:
+                    left = mid + 1
+                else:
+                    right = mid - 1
+            return right
+
+        start = binary_search_left(nums, target)
+        end = binary_search_right(nums, target)
+
+        #判断
+        if start <= end and start < n and nums[start] == target:
+            return [start, end]
+        else:
+            return [-1, -1]
+    print(searchRange)
+```
