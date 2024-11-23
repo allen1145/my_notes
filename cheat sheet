@@ -119,7 +119,7 @@ class Solution:
         return ans
     ans = trap
     print(ans)
-#单调栈解法
+### 单调栈解法
 ```python
 class Solution:
     def trap(self, height: List[int]) -> int:
@@ -139,4 +139,52 @@ class Solution:
             stack.append(i)
         
         return ans
+```
+### 扔一个dfs模板
+```python
+#可移动方式
+dx = [1, -1, 0, 0]
+dy = [0, 0, 1, -1]
+
+#维护，防止越界
+def in_bound(x, y, n, m):
+    return 0 <= x < n and 0 <= y < m
+
+#定义dfs函数
+def dfs(x, y, n, m, visited, matrix, path, value, last_path, last_value):
+    
+    #如果走到终点，且value大于last_value，更新last_value以及last_path
+    if x == n - 1 and y == m - 1:
+        if value > last_value or last_value == 0:
+            last_value = value
+            last_path = path[:]
+        return last_path, last_value
+    
+    #递归调用与回溯
+    for i in range(4):
+        next_x = x + dx[i]
+        next_y = y + dy[i]
+        if in_bound(next_x, next_y, n, m) and not visited[next_x][next_y]:
+            value += matrix[next_x][next_y]
+            path.append([next_x, next_y])
+            visited[next_x][next_y] = True
+            last_path, last_value = dfs(next_x, next_y, n, m, visited, matrix, path, value, last_path, last_value)
+            value -= matrix[next_x][next_y]
+            path.pop()
+            visited[next_x][next_y] = False
+    return last_path, last_value
+
+#主函数
+n, m = map(int,input().split())
+visited = [[False] * m for _ in range(n)]
+visited[0][0] = True
+matrix = []
+for i in range(n):
+    matrix.append(list(map(int,input().split())))
+#初始化
+value, last_value = matrix[0][0], float('-inf')
+path, last_path = [[0, 0]], []
+last_path, last_value = dfs(0, 0, n, m, visited, matrix, path, value, last_path, last_value)
+for i in last_path:
+    print(' '.join([str(e + 1) for e in i]))
 ```
