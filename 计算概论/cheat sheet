@@ -100,6 +100,37 @@ class Solution:
     ans = lengthOfLongestSubstring
     print(ans)
 ```
+### 小偷背包类型动态规划
+```python
+n, t = map(int, input().split())
+value = list(map(int, input().split()))
+def discount(n, t, value):
+    sum_value = sum(value)
+    if sum_value < t:
+        return 0
+    dp = [0] * (sum_value + 1)
+    for i in range(1, n + 1):
+        for j in range(sum_value, 0, -1):
+            if value[i - 1] <= j:
+                dp[j] = max(dp[j], dp[j - value[i - 1]] + value[i - 1])
+    for i in range(t, sum_value + 1):
+        if dp[i] >= t:
+            return dp[i]
+ans = discount(n, t, value)
+print(ans)
+```
+```python
+N, B = map(int,input().split())
+value = list(map(int,input().split()))
+weight = list(map(int,input().split()))
+dp = [0] * (B + 1)
+for i in range(1, N + 1):
+    for j in range(B, 0, -1):
+        if weight[i-1] <=  j:
+            dp[j] = max(dp[j],dp[j - weight[i-1]] + value[i-1])
+print(dp[B])
+```
+
 ### 接雨水
 ```python
 #动态规划解法
@@ -187,6 +218,77 @@ path, last_path = [[0, 0]], []
 last_path, last_value = dfs(0, 0, n, m, visited, matrix, path, value, last_path, last_value)
 for i in last_path:
     print(' '.join([str(e + 1) for e in i]))
+```
+### bfs模板（以及python数据读入可能遇到的问题）
+```python
+import sys
+sys.setrecursionlimit(300000)
+input = sys.stdin.read
+
+from collections import deque
+
+dx = [1, -1, 0, 0]
+dy = [0, 0, 1, -1]
+
+def in_bound(x, y, M, N):
+    return 0 <= x < M and 0 <= y < N
+
+def bfs(matrix, M, N, positions, x_c, y_c):
+    visited = [[False] * N for _ in range(M)]
+    queue = deque([])
+    
+    for x_i, y_i, heigh in positions:
+        if x_i == x_c and y_i == y_c:
+            return True
+        visited[x_i][y_i] = True
+        queue.append((x_i, y_i, heigh))
+    
+    while queue:
+        cur_x, cur_y, heigh = queue.popleft()
+        for i in range(4):
+            next_x = cur_x + dx[i]
+            next_y = cur_y + dy[i]
+            
+            if in_bound(next_x, next_y, M, N) and not visited[next_x][next_y] and matrix[next_x][next_y] < heigh:
+                if next_x == x_c and next_y == y_c:
+                    return True
+                visited[next_x][next_y] = True
+                queue.append((next_x, next_y, heigh))
+    
+    return visited[x_c][y_c]
+
+# 读取所有输入
+data = input().split()
+index = 0
+
+ans = []
+K = int(data[index])
+index += 1
+
+for i in range(K):
+    M, N = map(int, data[index:index + 2])
+    index += 2
+    matrix = []
+    for _ in range(M):
+        matrix.append(list(map(int, data[index:index + N])))
+        index += N    
+    x_c, y_c = map(int, data[index:index + 2])
+    index += 2
+    P = int(data[index])
+    index += 1
+    positions = []
+    for j in range(P):
+        x_i, y_i = map(int, data[index: index + 2])
+        positions.append((x_i - 1, y_i - 1, matrix[x_i - 1][y_i - 1]))
+        index += 2
+    
+    if bfs(matrix, M, N, positions, x_c - 1, y_c - 1):
+        ans.append('Yes')
+    else:
+        ans.append('No')
+
+for answer in ans:
+    print(answer)
 ```
 ### 二维矩阵二分查找
 ```python
