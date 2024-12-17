@@ -40,6 +40,118 @@ for s in data:
             else:
                 min_stack.append(min_stack[-1])
 ```
+
+### 区间问题
+```
+'''
+#pypy能过,python超时
+import sys
+input = sys.stdin.readline
+
+def add_interval(start, end, l, r):
+    left, right = 0, len(start)
+    while left < right:
+        mid = (left + right) // 2
+        if start[mid] > l:
+            right = mid
+        else:
+            left = mid + 1
+    start.insert(left, l)
+    left, right = 0, len(end)
+    while left < right:
+        mid = (left + right) // 2
+        if end[mid] > r:
+            right = mid
+        else:
+            left = mid + 1
+    end.insert(left, r)
+
+def remove_interval(start, end, l, r):
+    left, right = 0, len(start)
+    while left < right:
+        mid = (left + right) // 2
+        if start[mid] == l:
+            del start[mid]
+            break
+        elif start[mid] > l:
+            right = mid
+        else:
+            left = mid + 1
+    left, right = 0, len(end)
+    while left < right:
+        mid = (left + right) // 2
+        if end[mid] == r:
+            del end[mid]
+            return
+        elif end[mid] > r:
+            right = mid
+        else:
+            left = mid + 1
+
+def check(start, end):
+    if len(start) > 1 and start[-1] > end[0]:
+        return True
+    return False
+
+n = int(input())
+start = []
+end = []
+for i in range(n):
+    operater, l, r = map(str, input().strip().split())
+    l , r = int(l), int(r)
+    if operater == '+':
+        add_interval(start, end, l, r)
+    if operater == '-':
+        remove_interval(start, end, l, r)
+    #print(start)
+    #print(end)
+    if check(start, end):
+        print('YES')
+    else:
+        print('NO')
+'''
+
+import sys
+import heapq
+from collections import defaultdict
+input = sys.stdin.readline
+
+minH = []
+maxH = []
+
+ldict = defaultdict(int)
+rdict = defaultdict(int)
+
+n = int(input())
+
+for _ in range(n):
+    op, l, r = map(str, input().strip().split())
+    l, r = int(l), int(r)
+    
+    if op == "+":
+        ldict[l] += 1
+        rdict[r] += 1
+        heapq.heappush(maxH, -l)
+        heapq.heappush(minH, r)
+    else:
+        ldict[l] -= 1
+        rdict[r] -= 1
+
+    # 使用 while 循环，将最大堆 maxH 和最小堆 minH 中出现次数为 0 的边界移除。
+    # 通过比较堆顶元素的出现次数，如果出现次数为 0，则通过 heappop 方法将其从堆中移除。
+    while len(maxH) > 0 >= ldict[-maxH[0]]:
+        heapq.heappop(maxH)
+    while len(minH) > 0 >= rdict[minH[0]]:
+        heapq.heappop(minH)
+
+    # 判断堆 maxH 和 minH 是否非空，并且最小堆 minH 的堆顶元素是否小于
+    # 最大堆 maxH 的堆顶元素的相反数。
+    if len(maxH) > 0 and len(minH) > 0 and minH[0] < -maxH[0]:
+        print("Yes")
+    else:
+        print("No")
+```
+
 ### 整数划分问题dp算法
 ```python
 dp = [0] * (50 + 1)  
